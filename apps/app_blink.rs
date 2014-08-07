@@ -6,6 +6,11 @@ extern crate core;
 extern crate zinc;
 #[phase(plugin)] extern crate macro_platformtree;
 
+use zinc::hal::lpc17xx::pin::Pin;
+use zinc::drivers::chario::CharIO;
+use core::option::Some;
+use zinc::drivers::mma7361::MMA7361;
+
 platformtree!(
   lpc17xx@mcu {
     clock {
@@ -25,10 +30,24 @@ platformtree!(
       }
     }
 
+    uart {
+      uart@0 {
+        baud_rate = 115200;
+        mode = "8N1";
+        tx = &uart_tx;
+        rx = &uart_rx;
+      }
+    }
+
     gpio {
+      0 {
+        uart_tx@2;
+        uart_rx@3;
+      }
       1 {
         led1@18 { direction = "out"; }
         led2@20 { direction = "out"; }
+        led3@21 { direction = "out"; }
       }
     }
   }
@@ -40,6 +59,8 @@ platformtree!(
         timer = &timer;
         led1 = &led1;
         led2 = &led2;
+        led3 = &led3;
+        uart = &uart;
       }
     }
   }
@@ -47,14 +68,29 @@ platformtree!(
 
 #[no_split_stack]
 fn run(args: &pt::run_args) {
-  use zinc::hal::pin::GPIO;
-  use zinc::hal::timer::Timer;
+    use zinc::hal::pin::{GPIO, High, Low};
+    use zinc::hal::lpc17xx::pin::{Pin, Port0, AltFunction1, GPIO};
+    use zinc::hal::timer::Timer;
+    use zinc::hal::pin::{In, Out};
+    use zinc::hal::lpc17xx::adc::ADC;
 
-  args.led1.set_high();
-  args.led2.set_low();
-  args.timer.wait(1);
+    args.uart.puts("Starting...");
+    args.uart.puts("\n\r");
 
-  args.led1.set_low();
-  args.led2.set_high();
-  args.timer.wait(1);
+
+    let adc = ADC::new();
+    let x   = (0, 0);
+    let y   = (0, 1);
+    let z   = (0, 2);
+    let acc = MMA7361::new(adc, x, y, z);
+
+    loop {
+        let x = acc.read(x);
+        args.uart.puts("X (mvolts): ");
+        // args.uart.puti(x);
+        args.uart.puts("\n\r");
+        args.uart.puts(" G Force: ");
+        args.uart.puti(x / 800);
+        args.uart.puts("\n\r");
+    }
 }

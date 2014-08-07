@@ -18,11 +18,12 @@
 use core::mem::{size_of, transmute};
 use core::intrinsics::abort;
 
+use zinc::hal::uart::{Parity, Disabled};
 use drivers::chario::CharIO;
-use hal::uart::{UART, UARTConf};
+use hal::lpc17xx::uart::{UART};
 
 extern {
-  fn memcpy(dest: *mut u8, src: *u8, n: int);
+  fn memcpy(dest: *mut u8, src: *const u8, n: int);
 }
 
 // TODO(farcaller): fix when size_of is avaliable in statics.
@@ -33,22 +34,22 @@ static mut uart_buf: [u8, ..SizeOfUART] = [0, ..SizeOfUART];
 /// Initializes debug port with uart configuration.
 ///
 /// This function must be called before any debug port use.
-pub fn setup(conf: &UARTConf) {
+pub fn setup() {
   if SizeOfUART < size_of::<UART>() {
     unsafe { abort() };
   }
 
-  let uart: UART = conf.setup();
+  let uart: UART = UART::new(UART0, 9600, WordLen8bits, Disabled);
 
   unsafe {
-    let src_ptr: *u8 = transmute(&uart);
+    let src_ptr: *const u8 = transmute(&uart);
     let dst_ptr: *mut u8 = transmute(&uart_buf);
     memcpy(dst_ptr, src_ptr, size_of::<UART>() as int);
   }
 }
 
 /// Returns a CharIO corresponding to current debug port.
-pub fn io() -> &CharIO {
+pub fn io<'a>() -> &'a CharIO {
   let uart: &UART = unsafe { transmute(&uart_buf) };
 
   uart as &CharIO

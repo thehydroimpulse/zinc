@@ -18,3 +18,4 @@
 pub mod lcd;
 pub mod chario;
 pub mod dht22;
+pub mod mma7361;

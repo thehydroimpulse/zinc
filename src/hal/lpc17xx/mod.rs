@@ -21,3 +21,4 @@ pub mod pin;
 // pub mod ssp;
 pub mod timer;
 pub mod uart;
+pub mod adc;

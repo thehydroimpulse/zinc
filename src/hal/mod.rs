@@ -31,6 +31,7 @@ pub mod cortex_m3;
 pub mod cortex_m4;
 
 pub mod mem_init;
+pub mod adc;
 pub mod pin;
 pub mod spi;
 pub mod stack;

@@ -79,5 +79,7 @@ lpc17xx_iomem_CLKSRCSEL = 0x400FC10C;
 
 lpc17xx_iomem_PCLKSEL0  = 0x400FC1A8;
 lpc17xx_iomem_PCLKSEL1  = 0x400FC1AC;
+lpc17xx_iomem_AD0CR     = 0x40034000;
+lpc17xx_iomem_ADDR0     = 0x40034010;
 
 lpc17xx_iomem_SCS       = 0x400FC1A0;

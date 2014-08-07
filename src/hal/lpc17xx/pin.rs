@@ -174,6 +174,7 @@ mod reg {
     #[link_name="lpc17xx_iomem_PINSEL10"] pub static PINSEL10: PINSEL;
   }
 
+
   ioreg!(GPIO: u32, FIODIR, _r0, _r1, _r2, FIOMASK, FIOPIN, FIOSET, FIOCLR)
   reg_rw!(GPIO, u32, FIODIR,  set_FIODIR,  FIODIR)
   reg_rw!(GPIO, u32, FIOMASK, set_FIOMASK, FIOMASK)
